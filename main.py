@@ -29,8 +29,9 @@ def detrending(x, y):
 	x = numpy.reshape(x, (len(x), 1))
 	model.fit(x, y)
 	trend = model.predict(x)
+	
 	detrended = [y[i]-trend[i] for i in range(0, len(y))]
-	return detrended
+	return trend, detrended
 
 def periodogram(Y):
 	m = len(Y)**2
@@ -47,7 +48,7 @@ def Tukey_weight(N1, m):
 	return W
 
 def weighed_correlogramm(N, c):
-	N1 = 0.05*N
+	N1 = 0.5*N
 	wc = [x*Tukey_weight(N1,i) for (i, x) in enumerate(c[:int(N1)])]
 	return wc
 
@@ -55,12 +56,15 @@ def main():
 	dt = 1
 	x, y = tsgen()
 	Y = centering(y)
-	#plt.plot(x, Y)
-	#plt.plot(trend)
-	Y = detrending(x,Y)
-	#plt.plot(x, Y)
+	plt.plot(x, Y)
+	trend, Y = detrending(x,Y)
+	plt.plot(trend)
+	plt.show()
+	plt.plot(x, Y)
+	plt.show()
 	f, ppx = signal.periodogram(Y)
-	#plt.plot(f, ppx)
+	plt.plot(f, ppx)
+	plt.show()
 	c = autocorr(Y)
 	N = len(c)
 	wc = weighed_correlogramm(N,c)
